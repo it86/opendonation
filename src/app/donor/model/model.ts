@@ -5,3 +5,10 @@ export interface DonorValues {
   postalCode: string;
   city: string;
 }
+
+export interface DonorEntity {
+  id: number;
+  createdAt: Date;
+  updatedAt: Date;
+  values: DonorValues;
+}

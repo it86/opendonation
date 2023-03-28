@@ -1,44 +1,58 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { createColumnHelper } from "@tanstack/react-table";
-import { Donor } from "@prisma/client";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
-import { DonorValues } from "../model/model";
+import { DonorEntity, DonorValues } from "../model/model";
 import DonorForm from "./DonorForm";
 import BasicTable from "@/components/BasicTable";
 
-const columnHelper = createColumnHelper<Donor>();
+const columnHelper = createColumnHelper<DonorEntity>();
 
 const columns = [
-  columnHelper.accessor("firstName", {
+  columnHelper.accessor("values.firstName", {
     header: () => "Vorname",
   }),
-  columnHelper.accessor("lastName", {
+  columnHelper.accessor("values.lastName", {
     header: () => "Nachname",
   }),
-  columnHelper.accessor("street", {
+  columnHelper.accessor("values.street", {
     header: () => "Straße",
   }),
-  columnHelper.accessor("postalCode", {
+  columnHelper.accessor("values.postalCode", {
     header: () => "Postleitzahl",
   }),
-  columnHelper.accessor("city", {
+  columnHelper.accessor("values.city", {
     header: () => "Ort",
   }),
 ];
 
 export interface DonorTableProps {
-  data: Array<Donor>;
+  data: Array<DonorEntity>;
 }
 
-export default function DonorTable({ data }: DonorTableProps) {
-  const [show, setShow] = useState(false);
-  const [donor, setDonor] = useState<Donor>();
+const DEFAULT: DonorValues = {
+  firstName: "",
+  lastName: "",
+  street: "",
+  postalCode: "",
+  city: "",
+};
 
-  function handleStartEdit(row: Donor) {
-    setDonor(row);
+export default function DonorTable({ data }: DonorTableProps) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
+  const [show, setShow] = useState(false);
+
+  const [donorEntity, setDonorEntity] = useState<DonorEntity>();
+  const [donorValues, setDonorValues] = useState<DonorValues>(DEFAULT);
+
+  function handleStartEdit(row: DonorEntity) {
+    setDonorEntity(row);
+    setDonorValues(row.values);
     setShow(true);
   }
 
@@ -46,23 +60,42 @@ export default function DonorTable({ data }: DonorTableProps) {
     setShow(false);
   }
 
+  async function handleSave() {
+    console.log("Start Saving...");
+
+    const donor = donorEntity!;
+    donor.values = donorValues;
+
+    await fetch("./donor/api", {
+      method: "PUT",
+      body: JSON.stringify(donor),
+    });
+
+    console.log("End Saving...");
+
+    startTransition(() => {
+      router.refresh();
+      handleClose();
+    });
+  }
+
   return (
     <>
       <BasicTable data={data} columns={columns} onStartEdit={handleStartEdit} />
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Spender bearbeitem</Modal.Title>
+          <Modal.Title>Spender bearbeiten</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {/* <DonorForm value={donor} onChange={setDonor} /> */}
+          <DonorForm value={donorValues} onChange={setDonorValues} />
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
             Abbrechen
           </Button>
-          {/* <Button variant="primary" onClick={handleSave} disabled={isPending}>
+          <Button variant="primary" onClick={handleSave}>
             Speichern
-          </Button> */}
+          </Button>
         </Modal.Footer>
       </Modal>
     </>

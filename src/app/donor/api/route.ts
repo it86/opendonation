@@ -19,3 +19,24 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json(donor);
 }
+
+export async function PUT(request: NextRequest) {
+  const res = await request.json();
+
+  console.log(res);
+
+  const donor = await prisma.donor.update({
+    where: {
+      id: res.id,
+    },
+    data: {
+      firstName: res.values.firstName,
+      lastName: res.values.lastName,
+      street: res.values.street,
+      postalCode: res.values.postalCode,
+      city: res.values.city,
+    },
+  });
+
+  return NextResponse.json(donor);
+}

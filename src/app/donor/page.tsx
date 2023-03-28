@@ -1,11 +1,22 @@
 import React from "react";
 import { prisma } from "@/server/utils/prisma";
+import { DonorEntity } from "./model/model";
 import Content from "./content";
 
 async function getData() {
-  const donors = await prisma.donor.findMany();
-
-  // await new Promise((resolve) => setTimeout(resolve, 5000));
+  const records = await prisma.donor.findMany();
+  const donors: Array<DonorEntity> = records.map((record) => ({
+    id: record.id,
+    createdAt: record.createdAt,
+    updatedAt: record.updatedAt,
+    values: {
+      firstName: record.firstName || "",
+      lastName: record.lastName,
+      street: record.street,
+      postalCode: record.postalCode,
+      city: record.city,
+    },
+  }));
 
   return donors;
 }
