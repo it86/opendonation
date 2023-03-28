@@ -1,0 +1,37 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// --------------------------------------
+
+model Donor {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  firstName  String?
+  lastName   String
+  street     String
+  postalCode String
+  city       String
+
+  donations Donation[]
+}
+
+model Donation {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  amount    Decimal
+  date      DateTime
+
+  donor   Donor @relation(fields: [donorId], references: [id])
+  donorId Int
+}
