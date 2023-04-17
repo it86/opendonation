@@ -2,43 +2,43 @@
 
 import React from "react";
 import { createColumnHelper } from "@tanstack/react-table";
-import { Donation } from "@prisma/client";
+import { DonationEntity } from "../model/model";
 import BasicTable from "@/components/BasicTable";
 
-const columnHelper = createColumnHelper<Donation>();
+const columnHelper = createColumnHelper<DonationEntity>();
 
 const columns = [
   columnHelper.group({
     id: "donor",
     header: () => "Spender",
     columns: [
-      columnHelper.accessor("donorId", {
+      columnHelper.accessor("donor.firstName", {
         header: () => "Vorname",
       }),
-      //   columnHelper.accessor("donor.lastName", {
-      //     header: () => "Nachname",
-      //   }),
-      //   columnHelper.accessor("donor.street", {
-      //     header: () => "Straße",
-      //   }),
-      //   columnHelper.accessor("donor.postalCode", {
-      //     header: () => "Postleitzahl",
-      //   }),
-      //   columnHelper.accessor("donor.city", {
-      //     header: () => "Ort",
-      //   }),
+      columnHelper.accessor("donor.lastName", {
+        header: () => "Nachname",
+      }),
+      columnHelper.accessor("donor.street", {
+        header: () => "Straße",
+      }),
+      columnHelper.accessor("donor.postalCode", {
+        header: () => "Postleitzahl",
+      }),
+      columnHelper.accessor("donor.city", {
+        header: () => "Ort",
+      }),
     ],
   }),
-  columnHelper.accessor("amount", {
+  columnHelper.accessor("values.amount", {
     header: () => "Betrag",
   }),
-  columnHelper.accessor("date", {
+  columnHelper.accessor("values.date", {
     header: () => "Datum",
   }),
 ];
 
 export interface DonationTableProps {
-  data: Array<Donation>;
+  data: Array<DonationEntity>;
 }
 
 export default function DonationTable({ data }: DonationTableProps) {

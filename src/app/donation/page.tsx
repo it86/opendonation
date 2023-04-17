@@ -1,21 +1,37 @@
 import React from "react";
 import { prisma } from "@/server/utils/prisma";
-import DonationTable from "./components/DonationTable";
+import { DonationEntity } from "./model/model";
+import Content from "./content";
 
 async function getData() {
   const donations = await prisma.donation.findMany();
+  const donors = await prisma.donor.findMany();
 
-  // await new Promise((resolve) => setTimeout(resolve, 5000));
+  const donorMap = new Map(donors.map((donor) => [donor.id, donor]));
 
-  return donations;
+  const entities: Array<DonationEntity> = donations.map((donation) => {
+    const donor = donorMap.get(donation.donorId)!;
+
+    return {
+      values: {
+        amount: donation.amount.toNumber(),
+        date: donation.date,
+      },
+      donor: {
+        firstName: donor.firstName || "",
+        lastName: donor.lastName,
+        street: donor.street,
+        postalCode: donor.postalCode,
+        city: donor.city,
+      },
+    };
+  });
+
+  return entities;
 }
 
 export default async function Page() {
   const data = await getData();
 
-  return (
-    <>
-      <DonationTable data={data} />
-    </>
-  );
+  return <Content data={data} />;
 }

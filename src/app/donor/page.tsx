@@ -7,8 +7,8 @@ async function getData() {
   const records = await prisma.donor.findMany();
   const donors: Array<DonorEntity> = records.map((record) => ({
     id: record.id,
-    createdAt: record.createdAt,
-    updatedAt: record.updatedAt,
+    createdAt: record.createdAt.toISOString(),
+    updatedAt: record.updatedAt.toISOString(),
     values: {
       firstName: record.firstName || "",
       lastName: record.lastName,

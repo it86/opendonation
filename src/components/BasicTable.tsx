@@ -118,7 +118,7 @@ export default function BasicTable<Entity>({
               })}
               {onStartEdit && (
                 <td>
-                  <PencilSquare onClick={() => onStartEdit(data[row.index])} />
+                  <PencilSquare role="button" onClick={() => onStartEdit(data[row.index])} />
                 </td>
               )}
             </tr>

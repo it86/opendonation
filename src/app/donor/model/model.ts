@@ -8,7 +8,7 @@ export interface DonorValues {
 
 export interface DonorEntity {
   id: number;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
   values: DonorValues;
 }
